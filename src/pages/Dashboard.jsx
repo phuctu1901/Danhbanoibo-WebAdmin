@@ -3,7 +3,7 @@ import { CryptoUtil } from '../CryptoUtil';
 import { ExcelUtil } from '../ExcelUtil';
 import {
   Download, KeyRound, Smartphone, Database, ShieldCheck, Key, Copy, Save,
-  FileSpreadsheet, Upload, FileJson, AlertTriangle, Layers, Plus, Trash2, ScanSearch
+  FileSpreadsheet, Upload, FileJson, AlertTriangle, Layers, Plus, Trash2, ScanSearch, RefreshCw
 } from 'lucide-react';
 
 // Trigger download file từ bytes/text
@@ -459,6 +459,23 @@ export default function Dashboard({
               }
             }}><Save size={16}/> Khôi phục</button>
           </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t">
+          <p className="text-sm text-muted mb-2">Đổi khóa mới (dùng khi nghi lộ mã / cách ly thiết bị):</p>
+          <button
+            className="danger"
+            onClick={() => {
+              if (!window.confirm('ĐỔI SANG MASTER KEY MỚI?\n\nHậu quả:\n- Mọi mã kích hoạt đã cấp sẽ KHÔNG dùng được cho file xuất sau này.\n- Bạn phải xuất file .enc mới và cấp lại mã cho từng thiết bị.\n- File .enc cũ trên máy người dùng vẫn đọc được bằng mã cũ (cho tới khi họ import bản mới).\n\nTiếp tục?')) return;
+              if (!window.confirm('Đã lưu Master Key cũ chưa? Nếu sau này cần phát hành tiếp file CŨ thì phải có key cũ. Đổi bây giờ?')) return;
+              const k = CryptoUtil.generateMasterKey();
+              setMasterKey(k);
+              localStorage.setItem('danhba_master_key', CryptoUtil.bytesToBase64(k));
+              alert('Đã đổi Master Key. Copy lưu key mới, xuất file .enc mới, rồi cấp lại mã kích hoạt cho từng thiết bị.');
+            }}
+          >
+            <RefreshCw size={16}/> Đổi Master Key mới (rotate)
+          </button>
         </div>
       </div>
 

@@ -4,7 +4,7 @@ import {
   Shield, Lock, Key, Smartphone, ArrowRight, CheckCircle2, XCircle, Clock, UserX,
   ShieldAlert, Search, Phone, Cake, Star, Building2, WifiOff, FileSpreadsheet,
   FileJson, Database, Zap, Cpu, ServerOff, Apple, Play, RotateCcw, Loader2,
-  Github, FileLock, Fingerprint, RefreshCw, Ban, Layers, ShieldCheck
+  Github, FileLock, Fingerprint, RefreshCw, Ban, Layers, ShieldCheck, AlertTriangle, KeyRound
 } from 'lucide-react';
 import { CryptoUtil } from '../CryptoUtil';
 
@@ -345,6 +345,7 @@ export default function Landing() {
             <button onClick={() => scrollToId('tinh-nang')}>Tính năng</button>
             <button onClick={() => scrollToId('mo-phong')}>Mô phỏng</button>
             <button onClick={() => scrollToId('thuat-toan')}>Thuật toán</button>
+            <button onClick={() => scrollToId('kich-ban')}>Bảo mật</button>
           </div>
           <Link to="/admin" className="landing-nav-cta">
             Vào trang quản trị <ArrowRight size={16} />
@@ -566,6 +567,69 @@ export default function Landing() {
                 không thể dò tìm vũ phu (brute-force).
               </li>
             </ul>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ===== KỊCH BẢN XẤU: FILE .ENC BỊ LỘ ===== */}
+      <section className="landing-section" id="kich-ban">
+        <Reveal>
+          <div className="section-heading">
+            <div className="section-kicker text-danger"><AlertTriangle size={14} /> KỊCH BẢN XẤU</div>
+            <h2>File .enc bị lộ ra ngoài thì sao?</h2>
+            <p>Bốn tình huống thực tế — và câu trả lời của hệ thống ở từng mức.</p>
+          </div>
+        </Reveal>
+        <div className="features-grid">
+          {[
+            {
+              icon: <FileLock size={22} />,
+              verdict: 'ok', verdictText: 'AN TOÀN',
+              title: 'Chỉ file .enc bị lộ',
+              desc: 'Gửi nhầm nhóm chat, email bị đọc, USB rơi mất — kẻ có file cũng chỉ giữ ciphertext AES-256-GCM. Không có mã kích hoạt thì đó là chuỗi byte ngẫu nhiên; dò vũ phu trên không gian 2^256 là vô nghĩa. Không cần làm gì cả.',
+            },
+            {
+              icon: <AlertTriangle size={22} />,
+              verdict: 'bad', verdictText: 'BỊ LỘ',
+              title: 'File + mã kích hoạt lộ cùng lúc',
+              desc: 'Đủ bộ file + mã + DeviceID là giải mã được. Vì vậy hãy gửi file và mã qua HAI KÊNH khác nhau (file qua email, mã qua tin nhắn riêng). Nếu đã xảy ra: nội dung bản đó coi như đã đọc được — phản ứng ngay theo quy trình bên dưới.',
+            },
+            {
+              icon: <Smartphone size={22} />,
+              verdict: 'warn', verdictText: 'GIỚI HẠN',
+              title: 'Mã kích hoạt của 1 thiết bị bị lộ',
+              desc: 'Mã đã trộn SHA-256(DeviceID) nên chỉ chạy trên đúng máy đó — các thiết bị khác hoàn toàn không ảnh hưởng. Muốn "khai tử" thiết bị: đổi Master Key + phát hành file mới, mã cũ tự vô hiệu với bản mới.',
+            },
+            {
+              icon: <KeyRound size={22} />,
+              verdict: 'warn', verdictText: 'RỦI RO CẬP NHẬT',
+              title: 'Admin mất Master Key',
+              desc: 'Các file .enc cũ vẫn chạy bình thường với mã đã cấp (không cần key để dùng). Nhưng không xuất được bản cập nhật cùng khóa — khôi phục key từ nơi đã lưu; nếu mất hẳn: sinh khóa mới và cả tổ chức import lại file mới.',
+            },
+          ].map((s, i) => (
+            <Reveal key={i} delay={i * 90}>
+              <div className="feature-card">
+                <div className={`feature-icon verdict-${s.verdict}`}>{s.icon}</div>
+                <div className={`verdict v-${s.verdict}`}>{s.verdictText}</div>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal>
+          <div className="algo-notes glass-panel">
+            <h3><RotateCcw size={20} className="text-accent" /> Quy trình phản ứng trong 3 phút</h3>
+            <ol className="playbook">
+              <li><b>Đổi Master Key</b> ngay trong Admin Portal (nút "Đổi khóa mới") — mọi mã kích hoạt cũ vô hiệu với mọi bản phát hành tiếp theo.</li>
+              <li><b>Xuất file .enc mới</b> với khóa mới. Nội dung bản cũ kẻ đã đọc thì đã đọc — không thu hồi được — nhưng quyền truy cập bản mới sạch hoàn toàn.</li>
+              <li><b>Cấp lại mã mới</b> cho từng thiết bị, gửi qua kênh khác với file, rồi nhắc người dùng import đè lên bản cũ.</li>
+            </ol>
+            <p className="playbook-note">
+              Nói thẳng cho rõ: hệ thống bảo vệ <b>quyền truy cập</b>, không "rút lại" được thứ người khác đã đọc.
+              Vì vậy tách kênh gửi file / gửi mã ngay từ đầu là nước phòng thủ rẻ và hiệu quả nhất.
+            </p>
           </div>
         </Reveal>
       </section>

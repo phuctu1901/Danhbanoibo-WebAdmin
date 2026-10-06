@@ -1201,3 +1201,46 @@ button.danger:hover {
 
 .danger-zone { border-color: rgba(229, 72, 77, 0.35); }
 .danger-zone:hover { border-color: rgba(229, 72, 77, 0.6); }
+
+/* ===== Kịch bản lộ file + playbook ===== */
+section[id] { scroll-margin-top: 76px; } /* anchor không bị nav sticky che */
+
+.verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  padding: 0.26rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+}
+.verdict.v-ok { color: var(--success); background: rgba(18, 165, 148, 0.14); }
+.verdict.v-warn { color: #f59e0b; background: rgba(245, 158, 11, 0.14); }
+.verdict.v-bad { color: var(--danger); background: var(--danger-bg); }
+
+.feature-icon.verdict-ok { background: rgba(18, 165, 148, 0.12); color: var(--success); }
+.feature-icon.verdict-warn { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.feature-icon.verdict-bad { background: rgba(229, 72, 77, 0.12); color: var(--danger); }
+
+.playbook {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  counter-reset: none;
+}
+.playbook b { color: var(--text-main); }
+.playbook li::marker { color: var(--accent); font-weight: 700; }
+.playbook-note {
+  margin-top: 1.05rem;
+  padding-top: 0.95rem;
+  border-top: 1px dashed var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
