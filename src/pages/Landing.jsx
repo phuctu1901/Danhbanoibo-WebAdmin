@@ -754,8 +754,10 @@ export default function Landing() {
           ].map((s, i) => (
             <Reveal key={i} delay={i * 90}>
               <div className="feature-card">
-                <div className={`feature-icon verdict-${s.verdict}`}>{s.icon}</div>
-                <div className={`verdict v-${s.verdict}`}>{s.verdictText}</div>
+                <div className="feature-head">
+                  <div className={`feature-icon verdict-${s.verdict}`}>{s.icon}</div>
+                  <span className={`verdict v-${s.verdict}`}>{s.verdictText}</span>
+                </div>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
               </div>
