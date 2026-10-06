@@ -50,17 +50,26 @@ const Reveal = ({ children, delay = 0, className = '' }) => {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const show = () => el.classList.add('in');
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          el.classList.add('in');
+          show();
           io.disconnect();
         }
       },
       { threshold: 0.12 }
     );
     io.observe(el);
-    return () => io.disconnect();
+    // Dự phòng: mobile Safari trì hoãn callback IntersectionObserver khi cuộn nhanh
+    // → check trực tiếp vị trí, không để nội dung đứng ẩn (opacity 0) trong khung nhìn
+    const iv = setInterval(() => {
+      if (el.classList.contains('in')) { clearInterval(iv); return; }
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) { show(); clearInterval(iv); }
+    }, 250);
+    const stopIv = setTimeout(() => clearInterval(iv), 15000);
+    return () => { io.disconnect(); clearInterval(iv); clearTimeout(stopIv); };
   }, []);
   return (
     <div ref={ref} className={`reveal ${className}`} style={{ transitionDelay: `${delay}ms` }}>
@@ -338,6 +347,18 @@ function LiveSimulator() {
 /* ============ TRANG ============ */
 
 export default function Landing() {
+  // Anchor từ URL ban đầu (#ten-section) — main.jsx đã lưu trước khi router xử lý
+  useEffect(() => {
+    const id = window.__landingAnchor;
+    if (id) {
+      delete window.__landingAnchor;
+      const t = setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
   return (
     <div className="landing">
       <div className="landing-grid-bg" aria-hidden="true" />

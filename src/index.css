@@ -1203,7 +1203,7 @@ button.danger:hover {
 .danger-zone:hover { border-color: rgba(229, 72, 77, 0.6); }
 
 /* ===== Kịch bản lộ file + playbook ===== */
-section[id] { scroll-margin-top: 76px; } /* anchor không bị nav sticky che */
+section[id] { scroll-margin-top: 84px; } /* anchor không bị nav sticky che (nav ~59px + dư iOS toolbar) */
 
 .verdict {
   display: inline-flex;
