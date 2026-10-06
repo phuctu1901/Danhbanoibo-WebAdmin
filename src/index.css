@@ -743,3 +743,46 @@ button.danger:hover {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* Landing - mobile */
+.hero-device-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .landing-nav-inner { padding: 0.75rem 1rem; }
+  .landing-nav-cta { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+
+  .landing-hero { padding: 4rem 1.25rem 3.5rem; }
+  .hero-badge { font-size: 0.72rem; margin-bottom: 1.25rem; }
+  .hero-subtitle { font-size: 0.95rem; margin-bottom: 2rem; }
+
+  .landing-section { padding: 2rem 1rem; }
+
+  /* Nút full-width, xếp dọc trên mobile */
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions a {
+    justify-content: center;
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+  }
+
+  .feature-card, .step-card { padding: 1.15rem; }
+  .algo-notes { padding: 1.15rem; }
+  .cta-panel { padding: 2.5rem 1.25rem; }
+
+  .step-arrow { display: none; } /* lưới 1 cột, không cần mũi tên */
+
+  .step-code { padding: 0.7rem 0.75rem; }
+  .step-code code { font-size: 0.7rem; }
+}
+
+@media (max-width: 400px) {
+  .landing-logo span { font-size: 0.95rem; }
+}

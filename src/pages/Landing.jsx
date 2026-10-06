@@ -2,8 +2,26 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Shield, Lock, Key, Smartphone, ArrowRight, CheckCircle2,
-  FileLock, Fingerprint, Database, Zap, Cpu, ServerOff
+  FileLock, Fingerprint, Database, Zap, Cpu, ServerOff, Apple
 } from 'lucide-react';
+
+// TODO: Dán link App Store vào đây khi app được phát hành (VD: https://apps.apple.com/.../idXXXX)
+const APP_STORE_URL = '';
+
+// Nút tải app — hiện link tạm '#' cho đến khi điền APP_STORE_URL
+const AppStoreBtn = ({ ghost = false }) => {
+  const cls = ghost ? 'landing-btn-ghost' : 'landing-btn-primary';
+  return (
+    <a
+      className={cls}
+      href={APP_STORE_URL || '#thuat-toan'}
+      target={APP_STORE_URL ? '_blank' : undefined}
+      rel={APP_STORE_URL ? 'noopener noreferrer' : undefined}
+    >
+      <Apple size={18} /> Tải app trên App Store
+    </a>
+  );
+};
 
 const steps = [
   {
@@ -72,10 +90,14 @@ export default function Landing() {
           <Link to="/admin" className="landing-btn-primary">
             <FileLock size={18} /> Bắt đầu xuất file .enc
           </Link>
+          <AppStoreBtn ghost />
           <a href="#thuat-toan" className="landing-btn-ghost">
             Xem thuật toán <ArrowRight size={16} />
           </a>
         </div>
+        <p className="hero-device-hint">
+          <Smartphone size={14} /> App iOS nhập file .enc kèm mã kích hoạt riêng cho thiết bị
+        </p>
       </section>
 
       {/* ===== FEATURES ===== */}
@@ -143,9 +165,12 @@ export default function Landing() {
         <div className="cta-panel">
           <h2>Sẵn sàng phát hành danh bạ?</h2>
           <p>Nhập dữ liệu → xuất file .enc → cấp mã kích hoạt cho từng thiết bị. Vận hành trong 5 phút.</p>
-          <Link to="/admin" className="landing-btn-primary">
-            <Shield size={18} /> Mở Admin Portal
-          </Link>
+          <div className="hero-actions">
+            <Link to="/admin" className="landing-btn-primary">
+              <Shield size={18} /> Mở Admin Portal
+            </Link>
+            <AppStoreBtn ghost />
+          </div>
         </div>
       </section>
 
