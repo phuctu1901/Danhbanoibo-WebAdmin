@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
 export default function PeopleTable({ people, departments, savePeople }) {
+  const [justAddedId, setJustAddedId] = useState(null);
+  const tableContainerRef = useRef(null);
+
+  useEffect(() => {
+    // Cuộn xuống dòng vừa thêm để người dùng nhìn thấy ngay
+    if (justAddedId && tableContainerRef.current) {
+      tableContainerRef.current.scrollTop = tableContainerRef.current.scrollHeight;
+    }
+  }, [people.length]);
+
   const addRow = () => {
-    const newPerson = { 
-      id: `P_${Date.now()}`, 
-      fullName: '', 
-      gender: 'Nam', 
+    const newPerson = {
+      id: `P_${Date.now()}`,
+      fullName: '',
+      gender: 'Nam',
       birthday: '',
-      phone: '', 
+      phone: '',
       secondaryPhone: '',
       email: '',
       zalo: '',
@@ -17,14 +27,18 @@ export default function PeopleTable({ people, departments, savePeople }) {
       signal: '',
       signet: '',
       alias: '',
-      departmentId: departments[0]?.id || '', 
+      departmentId: departments[0]?.id || '',
       position: '',
       title: '',
       officeRoom: '',
       extensionNumber: '',
+      workAddress: '',
+      homeAddress: '',
+      currentAddress: '',
       note: ''
     };
     savePeople([...people, newPerson]);
+    setJustAddedId(newPerson.id);
   };
 
   const updatePerson = (id, field, value) => {
@@ -44,13 +58,14 @@ export default function PeopleTable({ people, departments, savePeople }) {
       </div>
 
       <div className="glass-panel p-0">
-        <div className="table-container" style={{maxHeight: 'calc(100vh - 200px)'}}>
+        <div className="table-container" ref={tableContainerRef} style={{maxHeight: 'calc(100vh - 200px)'}}>
           <table className="spreadsheet-table">
             <thead>
               <tr>
                 <th className="sticky-col">Họ tên *</th>
                 <th>Phòng ban *</th>
                 <th>Chức vụ *</th>
+                <th>Chức danh</th>
                 <th>Số điện thoại *</th>
                 <th>Email</th>
                 <th>Giới tính</th>
@@ -64,6 +79,9 @@ export default function PeopleTable({ people, departments, savePeople }) {
                 <th>Facebook</th>
                 <th>Signal</th>
                 <th>Signet</th>
+                <th>ĐC cơ quan</th>
+                <th>ĐC nhà</th>
+                <th>ĐC hiện tại</th>
                 <th>Ghi chú</th>
                 <th width="50" className="sticky-col-right">Xóa</th>
               </tr>
@@ -72,7 +90,7 @@ export default function PeopleTable({ people, departments, savePeople }) {
               {people.map(p => (
                 <tr key={p.id}>
                   <td className="editable-cell sticky-col">
-                    <input value={p.fullName} onChange={e => updatePerson(p.id, 'fullName', e.target.value)} placeholder="Họ tên"/>
+                    <input value={p.fullName} onChange={e => updatePerson(p.id, 'fullName', e.target.value)} placeholder="Họ tên" autoFocus={p.id === justAddedId}/>
                   </td>
                   <td className="editable-cell">
                     <select value={p.departmentId} onChange={e => updatePerson(p.id, 'departmentId', e.target.value)}>
@@ -82,6 +100,9 @@ export default function PeopleTable({ people, departments, savePeople }) {
                   </td>
                   <td className="editable-cell">
                     <input value={p.position} onChange={e => updatePerson(p.id, 'position', e.target.value)} placeholder="Chức vụ"/>
+                  </td>
+                  <td className="editable-cell">
+                    <input value={p.title || ''} onChange={e => updatePerson(p.id, 'title', e.target.value)} placeholder="Chức danh"/>
                   </td>
                   <td className="editable-cell">
                     <input value={p.phone} onChange={e => updatePerson(p.id, 'phone', e.target.value)} placeholder="SĐT"/>
@@ -126,6 +147,15 @@ export default function PeopleTable({ people, departments, savePeople }) {
                     <input value={p.signet || ''} onChange={e => updatePerson(p.id, 'signet', e.target.value)} placeholder="Tài khoản Signet"/>
                   </td>
                   <td className="editable-cell">
+                    <input value={p.workAddress || ''} onChange={e => updatePerson(p.id, 'workAddress', e.target.value)} placeholder="Địa chỉ cơ quan"/>
+                  </td>
+                  <td className="editable-cell">
+                    <input value={p.homeAddress || ''} onChange={e => updatePerson(p.id, 'homeAddress', e.target.value)} placeholder="Địa chỉ nhà"/>
+                  </td>
+                  <td className="editable-cell">
+                    <input value={p.currentAddress || ''} onChange={e => updatePerson(p.id, 'currentAddress', e.target.value)} placeholder="Địa chỉ hiện tại"/>
+                  </td>
+                  <td className="editable-cell">
                     <input value={p.note || ''} onChange={e => updatePerson(p.id, 'note', e.target.value)} placeholder="Ghi chú"/>
                   </td>
                   <td className="text-center sticky-col-right bg-dark">
@@ -137,7 +167,7 @@ export default function PeopleTable({ people, departments, savePeople }) {
               ))}
               {people.length === 0 && (
                 <tr>
-                  <td colSpan="18" className="text-center text-muted py-8">Chưa có dữ liệu. Bấm "Thêm dòng mới" để bắt đầu.</td>
+                  <td colSpan="22" className="text-center text-muted py-8">Chưa có dữ liệu. Bấm "Thêm dòng mới" để bắt đầu.</td>
                 </tr>
               )}
             </tbody>

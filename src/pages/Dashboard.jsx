@@ -1,42 +1,136 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CryptoUtil } from '../CryptoUtil';
 import { ExcelUtil } from '../ExcelUtil';
-import { Download, KeyRound, Smartphone, Database, ShieldCheck, Key, Copy, Save, FileSpreadsheet, Upload } from 'lucide-react';
+import { Download, KeyRound, Smartphone, Database, ShieldCheck, Key, Copy, Save, FileSpreadsheet, Upload, FileJson, AlertTriangle } from 'lucide-react';
+
+// Trigger download file từ bytes/text
+const downloadFile = (content, filename, type) => {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
 
 export default function Dashboard({ masterKey, setMasterKey, departments, people, saveDepts, savePeople }) {
   const [deviceId, setDeviceId] = useState('');
   const [activationCode, setActivationCode] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [importKeyInput, setImportKeyInput] = useState('');
+  const [datasetName, setDatasetName] = useState('Danh bạ chính');
   const fileInputRef = useRef(null);
+  const jsonBackupRef = useRef(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('danhba_dataset_name');
+    if (stored) setDatasetName(stored);
+  }, []);
+
+  const updateDatasetName = (value) => {
+    setDatasetName(value);
+    localStorage.setItem('danhba_dataset_name', value);
+  };
 
   const handleGenerateCode = async (e) => {
     e.preventDefault();
     if (!deviceId) return;
-    const code = await CryptoUtil.generateActivationCode(masterKey, deviceId);
+    const code = await CryptoUtil.generateActivationCode(masterKey, deviceId.trim());
     setActivationCode(code);
   };
 
-  const handleExport = async () => {
-    const exportData = {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      departments,
-      people
-    };
+  // Đóng gói đúng cấu trúc ExportData mà app iOS giải mã (JSONDecoder strict key)
+  const buildExportData = () => ({
+    version: 1,
+    datasetName: datasetName || 'Danh bạ chính',
+    departments: departments.map(d => ({
+      id: d.id,
+      name: d.name,
+      icon: d.icon || null // chuỗi rỗng sẽ làm iOS hiển thị icon lỗi, phải để null
+    })),
+    people: people.map(p => ({
+      id: p.id,
+      fullName: p.fullName || '',
+      gender: p.gender || 'Nam',
+      phone: p.phone || '',
+      secondaryPhone: p.secondaryPhone || null,
+      zalo: p.zalo || null,
+      telegram: p.telegram || null,
+      facebook: p.facebook || null,
+      signal: p.signal || null,
+      signet: p.signet || null,
+      email: p.email || null,
+      alias: p.alias || null,
+      departmentId: p.departmentId || '',
+      position: p.position || '',
+      title: p.title || null,
+      officeRoom: p.officeRoom || null,
+      extensionNumber: p.extensionNumber || null,
+      workAddress: p.workAddress || null,
+      homeAddress: p.homeAddress || null,
+      currentAddress: p.currentAddress || null,
+      note: p.note || null
+    }))
+  });
 
-    const jsonString = JSON.stringify(exportData);
+  const handleExport = async () => {
+    // Cảnh báo các dòng thiếu dữ liệu bắt buộc trước khi xuất
+    const invalid = people.filter(p => !p.fullName?.trim() || !p.phone?.trim() || !p.departmentId || !p.position?.trim());
+    const orphanDepts = people.filter(p => p.departmentId && !departments.some(d => d.id === p.departmentId));
+    const problems = [];
+    if (invalid.length > 0) problems.push(`${invalid.length} nhân sự thiếu Họ tên / SĐT / Phòng ban / Chức vụ`);
+    if (orphanDepts.length > 0) problems.push(`${orphanDepts.length} nhân sự thuộc phòng ban không tồn tại`);
+    if (people.length === 0) {
+      alert('Chưa có dữ liệu nhân sự để xuất file.');
+      return;
+    }
+    if (problems.length > 0 && !window.confirm(`Cảnh báo trước khi xuất:\n\n- ${problems.join('\n- ')}\n\nCác dòng này vẫn sẽ nằm trong file nhưng có thể hiển thị thiếu trên app. Tiếp tục xuất file?`)) {
+      return;
+    }
+
+    const jsonString = JSON.stringify(buildExportData());
     const encryptedData = await CryptoUtil.encryptData(jsonString, masterKey);
-    
-    const blob = new Blob([encryptedData], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'danhba.enc';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    const now = new Date();
+    const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    downloadFile(encryptedData, `Danhba_noibo_${stamp}.enc`, 'application/octet-stream');
+  };
+
+  // Sao lưu JSON không mã hoá (phòng khi mất Master Key / chuyển máy)
+  const handleBackupJson = () => {
+    const backup = { version: 1, datasetName, exportedAt: new Date().toISOString(), departments, people };
+    downloadFile(JSON.stringify(backup, null, 2), `Danhba_backup_${Date.now()}.json`, 'application/json');
+  };
+
+  const handleRestoreJson = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data.departments) || !Array.isArray(data.people)) {
+          throw new Error('Thiếu departments/people');
+        }
+        if (window.confirm(`File sao lưu chứa ${data.departments.length} phòng ban và ${data.people.length} nhân sự.\n\nGHI ĐÈ toàn bộ dữ liệu hiện tại?`)) {
+          if (data.datasetName) updateDatasetName(data.datasetName);
+          saveDepts(data.departments);
+          savePeople(data.people);
+          alert('Đã khôi phục dữ liệu từ file sao lưu!');
+        }
+      } catch (err) {
+        alert('File sao lưu không hợp lệ: ' + err.message);
+      }
+      e.target.value = '';
+    };
+    reader.onerror = () => {
+      alert('Không đọc được file');
+      e.target.value = '';
+    };
+    reader.readAsText(file);
   };
 
   const handleExcelUpload = (e) => {
@@ -82,32 +176,61 @@ export default function Dashboard({ masterKey, setMasterKey, departments, people
         <div className="glass-panel">
           <h2><Download size={20} className="text-accent"/> Xuất File Dữ Liệu</h2>
           <p className="subtitle mb-4">
-            File danhba.enc sau khi xuất đã được mã hóa. Chỉ thiết bị có mã kích hoạt mới có thể đọc.
+            File .enc sau khi xuất đã được mã hóa AES-256-GCM. Chỉ thiết bị có mã kích hoạt mới có thể đọc (Import trên app iOS).
           </p>
+          <div className="mb-4">
+            <label className="text-sm text-muted mb-2" style={{display: 'block'}}>Tên tập dữ liệu (hiển thị trên app):</label>
+            <input
+              value={datasetName}
+              onChange={e => updateDatasetName(e.target.value)}
+              placeholder="VD: Danh bạ chính"
+            />
+          </div>
           <button onClick={handleExport} className="w-full justify-center accent">
-            <Download size={18}/> Tải file danhba.enc
+            <Download size={18}/> Tải file .enc (mã hóa)
           </button>
+          <div className="border-t mt-4 pt-4">
+            <p className="text-sm text-muted mb-2">Sao lưu dữ liệu không mã hóa (dùng khi khôi phục / chuyển máy):</p>
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={handleBackupJson} className="secondary">
+                <FileJson size={16}/> Tải backup JSON
+              </button>
+              <input
+                type="file"
+                accept=".json"
+                style={{ display: 'none' }}
+                ref={jsonBackupRef}
+                onChange={handleRestoreJson}
+              />
+              <button className="secondary" onClick={() => jsonBackupRef.current?.click()}>
+                <Upload size={16}/> Khôi phục từ backup
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="glass-panel">
           <h2><KeyRound size={20} className="text-accent"/> Cấp Mã Kích Hoạt</h2>
           <p className="subtitle mb-4">
-            Nhập Device ID của thiết bị cần cấp quyền truy cập.
+            Nhập Device ID của thiết bị cần cấp quyền truy cập. (Trên app: màn hình Nhập dữ liệu → chạm để copy Mã thiết bị)
           </p>
           <form onSubmit={handleGenerateCode} className="flex gap-2">
-            <input 
-              placeholder="VD: 276EB32B-..." 
+            <input
+              placeholder="VD: 276EB32B-..."
               value={deviceId}
               onChange={e => setDeviceId(e.target.value)}
               required
             />
             <button type="submit" className="accent"><Smartphone size={16}/> Tạo mã</button>
           </form>
-          
+
           {activationCode && (
             <div className="code-box mt-4">
-              <div className="text-muted text-sm mb-2">Mã kích hoạt:</div>
-              <div className="text-lg">{activationCode}</div>
+              <div className="text-muted text-sm mb-2">Mã kích hoạt (gửi cho người dùng này):</div>
+              <div className="text-lg font-mono" style={{wordBreak: 'break-all'}}>{activationCode}</div>
+              <button className="secondary mt-4" onClick={() => navigator.clipboard.writeText(activationCode)}>
+                <Copy size={16}/> Copy mã
+              </button>
             </div>
           )}
         </div>
@@ -143,6 +266,10 @@ export default function Dashboard({ masterKey, setMasterKey, departments, people
         <h2><Key size={20} className="text-muted"/> Quản Lý Master Key (Khóa Chủ)</h2>
         <p className="subtitle mb-4">
           Master Key là chìa khóa gốc dùng để mã hóa file. Nếu bạn đổi trình duyệt hoặc cài lại máy, bạn cần lưu lại đoạn mã này để nạp lại.
+        </p>
+        <p className="text-sm text-warning mb-4 flex gap-2">
+          <AlertTriangle size={16} style={{flexShrink: 0, marginTop: '2px'}}/>
+          <span><b>Quan trọng:</b> Nếu mất Master Key, mọi file .enc đã phát hành sẽ <b>không thể giải mã vĩnh viễn</b>, kể cả khi có dữ liệu trong trang này. Hãy Copy và lưu nơi an toàn ngay bây giờ.</span>
         </p>
         
         <div className="flex gap-2 mb-4">

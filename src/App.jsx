@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+// Dùng HashRouter vì GitHub Pages là host tĩnh (không rewrite URL được như BrowserRouter)
+import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { CryptoUtil } from './CryptoUtil';
-import { Shield, Users, Building2, LayoutDashboard } from 'lucide-react';
+import { Shield, Users, Building2, LayoutDashboard, Home } from 'lucide-react';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import DeptTable from './pages/DeptTable';
 import PeopleTable from './pages/PeopleTable';
@@ -9,9 +11,10 @@ import PeopleTable from './pages/PeopleTable';
 const Sidebar = () => {
   const location = useLocation();
   const navItems = [
-    { path: '/', icon: <LayoutDashboard size={20} />, label: 'Tổng Quan' },
-    { path: '/departments', icon: <Building2 size={20} />, label: 'Phòng Ban' },
-    { path: '/people', icon: <Users size={20} />, label: 'Nhân Sự' },
+    { path: '/', icon: <Home size={20} />, label: 'Trang Chủ' },
+    { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Tổng Quan' },
+    { path: '/admin/departments', icon: <Building2 size={20} />, label: 'Phòng Ban' },
+    { path: '/admin/people', icon: <Users size={20} />, label: 'Nhân Sự' },
   ];
 
   return (
@@ -22,9 +25,9 @@ const Sidebar = () => {
       </div>
       <nav className="sidebar-nav">
         {navItems.map(item => (
-          <Link 
-            key={item.path} 
-            to={item.path} 
+          <Link
+            key={item.path}
+            to={item.path}
             className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
           >
             {item.icon}
@@ -35,6 +38,14 @@ const Sidebar = () => {
     </div>
   );
 };
+
+// Khung trang quản trị: sidebar + nội dung
+const AdminLayout = ({ children }) => (
+  <div className="app-layout">
+    <Sidebar />
+    <main className="main-content">{children}</main>
+  </div>
+);
 
 function App() {
   const [masterKey, setMasterKey] = useState(null);
@@ -72,18 +83,26 @@ function App() {
   if (!masterKey) return null;
 
   return (
-    <BrowserRouter>
-      <div className="app-layout">
-        <Sidebar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Dashboard masterKey={masterKey} setMasterKey={setMasterKey} departments={departments} people={people} saveDepts={saveDepts} savePeople={savePeople} />} />
-            <Route path="/departments" element={<DeptTable departments={departments} saveDepts={saveDepts} />} />
-            <Route path="/people" element={<PeopleTable people={people} departments={departments} savePeople={savePeople} />} />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/admin" element={
+          <AdminLayout>
+            <Dashboard masterKey={masterKey} setMasterKey={setMasterKey} departments={departments} people={people} saveDepts={saveDepts} savePeople={savePeople} />
+          </AdminLayout>
+        } />
+        <Route path="/admin/departments" element={
+          <AdminLayout>
+            <DeptTable departments={departments} people={people} saveDepts={saveDepts} />
+          </AdminLayout>
+        } />
+        <Route path="/admin/people" element={
+          <AdminLayout>
+            <PeopleTable people={people} departments={departments} savePeople={savePeople} />
+          </AdminLayout>
+        } />
+      </Routes>
+    </HashRouter>
   );
 }
 

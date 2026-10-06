@@ -1,5 +1,17 @@
 import * as XLSX from 'xlsx';
 
+// Chuẩn hoá số điện thoại: Excel lưu dạng số nên bị mất số 0 đầu (987654321 -> 0987654321)
+const normalizePhone = (value) => {
+  if (value === null || value === undefined) return '';
+  const s = String(value).trim();
+  if (!s) return '';
+  // Chỉ xử lý khi là chuỗi thuần số (Excel numeric cell)
+  if (/^\d+$/.test(s) && !s.startsWith('0')) {
+    return s.length === 9 ? '0' + s : s;
+  }
+  return s;
+};
+
 export const ExcelUtil = {
   // 1. Download Template
   downloadTemplate: () => {
@@ -13,17 +25,17 @@ export const ExcelUtil = {
 
     // Sheet 2: Nhan Su
     const personHeaders = [[
-      'HoTen', 'PhongBan_ID', 'ChucVu', 'SoDienThoai', 'Email', 
-      'GioiTinh', 'NgaySinh', 'SoDienThoaiPhu', 'BiDanh', 
-      'PhongLamViec', 'SoMayLe', 'Zalo', 'Telegram', 
-      'Facebook', 'Signal', 'Signet', 'GhiChu'
+      'HoTen', 'PhongBan_ID', 'ChucVu', 'ChucDanh', 'SoDienThoai', 'Email',
+      'GioiTinh', 'NgaySinh', 'SoDienThoaiPhu', 'BiDanh',
+      'PhongLamViec', 'SoMayLe', 'Zalo', 'Telegram',
+      'Facebook', 'Signal', 'Signet', 'DiaChiCoQuan', 'DiaChiNha', 'DiaChiHienTai', 'GhiChu'
     ]];
     const personData = [
       [
-        'Nguyễn Văn A', 'DEPT_1', 'Giám Đốc', '0987654321', 'nguyenvana@gmail.com', 
-        'Nam', '01/01/1980', '', '', 
-        'Phòng 101', '101', '0987654321', '@nguyenvana', 
-        '', '', '', 'Sếp lớn'
+        'Nguyễn Văn A', 'DEPT_1', 'Giám Đốc', '', '0987654321', 'nguyenvana@gmail.com',
+        'Nam', '01/01/1980', '', '',
+        'Phòng 101', '101', '0987654321', '@nguyenvana',
+        '', '', '', 'Số 1 Phạm Văn Đồng', '', '', 'Sếp lớn'
       ]
     ];
     const wsPerson = XLSX.utils.aoa_to_sheet([...personHeaders, ...personData]);
@@ -44,7 +56,7 @@ export const ExcelUtil = {
       try {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-        
+
         let newDepts = [];
         let newPeople = [];
 
@@ -66,19 +78,23 @@ export const ExcelUtil = {
             fullName: row.HoTen || 'Chưa có tên',
             departmentId: row.PhongBan_ID || (newDepts[0] ? newDepts[0].id : ''),
             position: row.ChucVu || '',
-            phone: row.SoDienThoai ? String(row.SoDienThoai) : '',
+            title: row.ChucDanh || '',
+            phone: normalizePhone(row.SoDienThoai),
             email: row.Email || '',
             gender: row.GioiTinh || 'Nam',
             birthday: row.NgaySinh ? String(row.NgaySinh) : '',
-            secondaryPhone: row.SoDienThoaiPhu ? String(row.SoDienThoaiPhu) : '',
+            secondaryPhone: normalizePhone(row.SoDienThoaiPhu),
             alias: row.BiDanh || '',
             officeRoom: row.PhongLamViec || '',
             extensionNumber: row.SoMayLe ? String(row.SoMayLe) : '',
-            zalo: row.Zalo ? String(row.Zalo) : '',
+            zalo: normalizePhone(row.Zalo),
             telegram: row.Telegram || '',
             facebook: row.Facebook || '',
-            signal: row.Signal ? String(row.Signal) : '',
+            signal: normalizePhone(row.Signal),
             signet: row.Signet || '',
+            workAddress: row.DiaChiCoQuan || '',
+            homeAddress: row.DiaChiNha || '',
+            currentAddress: row.DiaChiHienTai || '',
             note: row.GhiChu || ''
           }));
         }
