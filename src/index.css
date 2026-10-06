@@ -1266,12 +1266,32 @@ section[id] { scroll-margin-top: 76px; } /* anchor không bị nav sticky che */
   100% { top: 100%; opacity: 0; }
 }
 
-.fanio { margin-top: 0.25rem; }
+.fanio { max-width: 900px; margin: 0.25rem auto 0; }
 .fanio-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
 .fanio-card { animation: fadeIn 0.6s ease both; }
 
-.fanio-links { display: grid; grid-template-columns: repeat(3, 1fr); height: 54px; }
-.fanio-link { position: relative; }
+/* Desktop: fan-in SVG — 3 đường cong hội tụ vào đỉnh card iPhone (không còn đứt đoạn) */
+.fanio-links { display: block; }
+.fanio-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.fan-path {
+  stroke: rgba(50, 145, 255, 0.45);
+  stroke-width: 2;
+  stroke-dasharray: 7 9;
+  fill: none;
+  animation: svgDashFlow 0.9s linear infinite;
+}
+@keyframes svgDashFlow { to { stroke-dashoffset: -16; } }
+.fan-label { fill: var(--text-muted); font-size: 12.5px; }
+.fan-dot { fill: #3291ff; filter: drop-shadow(0 0 4px rgba(50, 145, 255, 0.9)); }
+.fan-end {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 6px rgba(50, 145, 255, 1));
+  animation: fanPulse 1.6s ease-in-out infinite;
+}
+@keyframes fanPulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+
+/* Dây thẳng đứng: chỉ hiện trên mobile (cards xếp 1 cột → 1 dây duy nhất căn giữa) */
+.fanio-link { display: none; position: relative; height: 100%; }
 .fanio-link .vline {
   position: absolute;
   top: 0; bottom: 0;
@@ -1349,7 +1369,9 @@ section[id] { scroll-margin-top: 76px; } /* anchor không bị nav sticky che */
 
 @media (max-width: 640px) {
   .fanio-row { grid-template-columns: 1fr; gap: 0.6rem; }
-  .fanio-links { height: 40px; }
+  .fanio-svg { display: none; }
+  .fanio-links { height: 56px; }
+  .fanio-link { display: block; }
   .fanio-card { display: flex; align-items: center; gap: 0.7rem; text-align: left; padding: 0.85rem 1rem; }
   .fanio-card .pipe-node-icon { margin-bottom: 0; width: 38px; height: 38px; flex-shrink: 0; }
 }

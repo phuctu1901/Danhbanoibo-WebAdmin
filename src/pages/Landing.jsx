@@ -170,6 +170,13 @@ const PIPELINE = [
 ];
 const PIPE_LINKS = ['JSON', 'File .enc', 'Mã kích hoạt ⊕ DeviceID'];
 
+// Sơ đồ fan-in: 3 đường cong hội tụ về đúng đỉnh card iPhone (viewBox 900×120)
+const FAN_PATHS = [
+  'M146 0 C146 72 450 44 450 120',
+  'M450 0 L450 120',
+  'M754 0 C754 72 450 44 450 120',
+];
+
 /* ============ MÔ PHỎNG MÃ HOÁ (chạy thật bằng Web Crypto) ============ */
 
 // Hiệu ứng "chữ chạy": xoay ký tự ngẫu nhiên khi đang chạy, chốt đúng giá trị khi xong
@@ -506,16 +513,35 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <div className="fanio-links">
-              {[0, 1, 2].map((i) => (
-                <div className="fanio-link" key={i}>
-                  <span className="vline" />
-                  <span className="vlabel">.enc riêng</span>
-                  <span className="fanio-dot" />
-                  <span className="fanio-dot d2" />
-                  <span className="fanio-dot d3" />
-                </div>
-              ))}
+            <div className="fanio-links" aria-hidden="true">
+              {/* Desktop: 3 đường cong hội tụ vào đỉnh iPhone, dot chạy theo đường cong */}
+              <svg className="fanio-svg" viewBox="0 0 900 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {FAN_PATHS.map((d, i) => (
+                  <path key={`p${i}`} className="fan-path" d={d} />
+                ))}
+                <text className="fan-label" x="146" y="22" textAnchor="middle">.enc riêng</text>
+                <text className="fan-label" x="468" y="22">.enc riêng</text>
+                <text className="fan-label" x="754" y="22" textAnchor="middle">.enc riêng</text>
+                {FAN_PATHS.map((d, i) => (
+                  <circle key={`a${i}`} className="fan-dot" r="4">
+                    <animateMotion dur="2.6s" begin={`${-(i * 0.85)}s`} repeatCount="indefinite" path={d} />
+                  </circle>
+                ))}
+                {FAN_PATHS.map((d, i) => (
+                  <circle key={`b${i}`} className="fan-dot" r="4">
+                    <animateMotion dur="2.6s" begin={`${-(i * 0.85 + 1.3)}s`} repeatCount="indefinite" path={d} />
+                  </circle>
+                ))}
+                <circle className="fan-end" cx="450" cy="117" r="3.5" />
+              </svg>
+              {/* Mobile: 1 dây thẳng đứng duy nhất, căn giữa, chạm đỉnh iPhone */}
+              <div className="fanio-link">
+                <span className="vline" />
+                <span className="vlabel">.enc riêng</span>
+                <span className="fanio-dot" />
+                <span className="fanio-dot d2" />
+                <span className="fanio-dot d3" />
+              </div>
             </div>
             <div className="fanio-phone">
               <div className="pipe-node-icon"><Smartphone size={24} /></div>
