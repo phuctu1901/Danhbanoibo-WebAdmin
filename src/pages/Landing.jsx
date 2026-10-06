@@ -4,7 +4,7 @@ import {
   Shield, Lock, Key, Smartphone, ArrowRight, CheckCircle2, XCircle, Clock, UserX,
   ShieldAlert, Search, Phone, Cake, Star, Building2, WifiOff, FileSpreadsheet,
   FileJson, Database, Zap, Cpu, ServerOff, Apple, Play, RotateCcw, Loader2,
-  Github, FileLock, Fingerprint, RefreshCw, Ban, Layers, ShieldCheck, AlertTriangle, KeyRound
+  Github, FileLock, Fingerprint, RefreshCw, Ban, Layers, ShieldCheck, AlertTriangle, KeyRound, MapPin, Timer, FlaskConical
 } from 'lucide-react';
 import { CryptoUtil } from '../CryptoUtil';
 
@@ -370,6 +370,7 @@ export default function Landing() {
         <p className="hero-subtitle">
           Nhập liệu trên web → xuất file <b>.enc</b> mã hoá AES-256 → người dùng import vào app iOS
           bằng <b>mã kích hoạt riêng cho từng thiết bị</b>. Ai không được cấp — không đọc được. Hết quyền — thu hồi trong 1 giây.
+          <b>Nhiều danh bạ song song</b> — mỗi đơn vị một tập riêng, phát hành &amp; cập nhật độc lập.
         </p>
         <div className="hero-actions">
           <Link to="/admin" className="landing-btn-primary">
@@ -381,6 +382,7 @@ export default function Landing() {
           </button>
         </div>
         <div className="hero-chips">
+          <span className="hero-chip"><Layers size={13} /> Nhiều danh bạ song song</span>
           <span className="hero-chip"><Lock size={13} /> AES-256-GCM</span>
           <span className="hero-chip"><Fingerprint size={13} /> Mã theo thiết bị</span>
           <span className="hero-chip"><WifiOff size={13} /> Offline 100%</span>
@@ -471,6 +473,149 @@ export default function Landing() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      {/* ===== MULTI DANH BẠ (CHI TIẾT) ===== */}
+      <section className="landing-section" id="multi-danh-ba">
+        <Reveal>
+          <div className="section-heading">
+            <div className="section-kicker text-accent"><Layers size={14} /> MULTI-DATASET</div>
+            <h2>Một tổ chức — nhiều danh bạ, tách bạch tuyệt đối</h2>
+            <p>
+              Không nhồi tất cả vào một file duy nhất. Mỗi danh bạ là một tập dữ liệu độc lập:
+              tên riêng, phòng ban riêng, nhân sự riêng — được xuất file, cập nhật và cấp quyền
+              hoàn toàn tách biệt. Trên iPhone, một thiết bị giữ được nhiều danh bạ cùng lúc và
+              chuyển đổi giữa chúng ngay trong app.
+            </p>
+          </div>
+        </Reveal>
+
+        {/* Sơ đồ fan-in: 3 danh bạ → 1 thiết bị */}
+        <Reveal delay={80}>
+          <div className="fanio">
+            <div className="fanio-row">
+              {[
+                { icon: <Shield size={24} />, title: 'Danh bạ Ban Giám đốc', sub: 'Mật · chỉ lãnh đạo' },
+                { icon: <Building2 size={24} />, title: 'Danh bạ Chi nhánh Bắc', sub: '21 phòng · 340 nhân sự' },
+                { icon: <Building2 size={24} />, title: 'Danh bạ Chi nhánh Nam', sub: '17 phòng · 280 nhân sự' },
+              ].map((n, i) => (
+                <div className="fanio-card pipe-node" key={i}>
+                  <div className="pipe-node-icon">{n.icon}</div>
+                  <div className="pipe-node-title">{n.title}</div>
+                  <div className="pipe-node-sub">{n.sub}</div>
+                </div>
+              ))}
+            </div>
+            <div className="fanio-links">
+              {[0, 1, 2].map((i) => (
+                <div className="fanio-link" key={i}>
+                  <span className="vline" />
+                  <span className="vlabel">.enc riêng</span>
+                  <span className="fanio-dot" />
+                  <span className="fanio-dot d2" />
+                  <span className="fanio-dot d3" />
+                </div>
+              ))}
+            </div>
+            <div className="fanio-phone">
+              <div className="pipe-node-icon"><Smartphone size={24} /></div>
+              <div className="pipe-node-title">Một chiếc iPhone — nhiều danh bạ</div>
+              <div className="phone-line">Import từng file .enc, app quản lý các danh bạ độc lập và chuyển đổi ngay trong ứng dụng</div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Use cases */}
+        <div className="features-grid" style={{ marginTop: '2.5rem' }}>
+          {[
+            {
+              icon: <ShieldAlert size={22} />,
+              title: 'Cấp mật theo phạm vi',
+              desc: 'Danh bạ Ban Giám đốc chứa số riêng tư của lãnh đạo — chỉ phát hành cho đúng nhóm đó. Danh bạ tác nghiệp chung thì phát rộng rãi. Mỗi tập một file, một danh sách người nhận: không ai phải giữ dữ liệu vượt quá quyền hạn của mình.',
+            },
+            {
+              icon: <MapPin size={22} />,
+              title: 'Tách theo đơn vị / địa lý',
+              desc: 'Chi nhánh Bắc, Trung, Nam mỗi nơi một danh bạ. Chi nhánh nào thay đổi nhân sự thì chỉ phát hành lại đúng tập của chi nhánh đó — các chi nhánh còn lại không phải import lại gì cả, tránh xáo trộn dữ liệu đang chạy tốt.',
+            },
+            {
+              icon: <Timer size={22} />,
+              title: 'Dự án & nhiệm kỳ có thời hạn',
+              desc: 'Đoàn công tác, hội nghị, dự án theo mùa — tạo một tập riêng, phát hành khi cần. Hết nhiệm kỳ: ngừng cấp mã và xoá bản nháp trên web, không để lại danh bạ "ma" vẫn lưu động ngoài kia.',
+            },
+            {
+              icon: <FlaskConical size={22} />,
+              title: 'Thử nghiệm an toàn trước khi phát hành',
+              desc: 'Soạn tập "Danh bạ thử nghiệm", tự import vào máy của quản trị viên để kiểm tra hiển thị, tìm kiếm, sinh nhật — trước khi ra bản chính thức. Sai sót chỉ nằm trong sandbox, không chạm tới dữ liệu thật đã phát hành.',
+            },
+          ].map((s, i) => (
+            <Reveal key={i} delay={i * 90}>
+              <div className="feature-card">
+                <div className="feature-icon">{s.icon}</div>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* Quy trình vận hành 5 bước */}
+        <Reveal>
+          <div className="algo-notes glass-panel">
+            <h3><Layers size={20} className="text-accent" /> Vận hành multi-danh bạ từ đầu đến cuối</h3>
+            <ol className="playbook">
+              <li>
+                <b>Tạo tập &amp; đặt tên chuẩn:</b> bấm ➕ trong sidebar hoặc card "Quản Lý Tập Danh Bạ".
+                Tên là danh tính của tập trên mọi thiết bị — đặt theo quy ước đơn vị (VD: <i>DB Trung ương 2026</i>)
+                vì app iOS nhận diện cập nhật theo đúng tên này.
+              </li>
+              <li>
+                <b>Nhập liệu riêng cho từng tập:</b> phòng ban và nhân sự luôn thuộc danh bạ đang mở.
+                Upload Excel cũng chỉ ghi đè đúng tập đó — không có chuyện dữ liệu hai đơn vị trộn vào nhau.
+              </li>
+              <li>
+                <b>Xuất file riêng từng tập:</b> mỗi lần xuất tạo một .enc độc lập, tên file gắn tên danh bạ
+                (VD <i>DB_Trung_uong_20260106.enc</i>) — phát cho đúng nhóm người nhận, qua kênh riêng.
+              </li>
+              <li>
+                <b>Cấp mã theo thiết bị — dùng chung cho mọi danh bạ:</b> mã kích hoạt gắn DeviceID chứ không gắn
+                danh bạ, nên một thiết bị dùng một mã cho mọi file cùng khóa. Người dùng cần 2 danh bạ? Gửi 2 file,
+                họ import 2 lần bằng đúng mã của máy họ.
+              </li>
+              <li>
+                <b>Cập nhật &amp; khai tử:</b> sửa dữ liệu → xuất lại → người dùng import với đúng tên cũ, app tự
+                <b> thay thế</b> tập cũ bằng bản mới. Muốn dừng hẳn một tập: ngừng phát hành, và đổi Master Key nếu nghi lộ.
+              </li>
+            </ol>
+          </div>
+        </Reveal>
+
+        {/* Bảng so sánh */}
+        <Reveal>
+          <div className="compare glass-panel">
+            <div className="compare-grid">
+              <div className="cg-cell cg-head" />
+              <div className="cg-cell cg-head bad">✗ Một file chung cho tất cả</div>
+              <div className="cg-cell cg-head good">✓ Nhiều danh bạ song song</div>
+
+              <div className="cg-cell cg-label">Khi cập nhật</div>
+              <div className="cg-cell">Phát lại toàn bộ danh bạ, cả tổ chức phải import lại file khổng lồ</div>
+              <div className="cg-cell">Chỉ phát lại đúng tập bị thay đổi, vài chục KB</div>
+
+              <div className="cg-cell cg-label">Khi cấp quyền</div>
+              <div className="cg-cell">Ai có file là có tất cả, không phân biệt cấp bậc</div>
+              <div className="cg-cell">Nhóm nào nhận tập đó — tách được theo cấp mật, theo đơn vị</div>
+
+              <div className="cg-cell cg-label">Khi file bị lộ</div>
+              <div className="cg-cell">Mất toàn bộ danh bạ của tổ chức</div>
+              <div className="cg-cell">Chỉ lộ đúng một tập, các tập khác nguyên vẹn</div>
+
+              <div className="cg-cell cg-label">Khi thử nghiệm</div>
+              <div className="cg-cell">Sửa gì cũng đụng dữ liệu thật</div>
+              <div className="cg-cell">Soạn tập thử riêng, xong xoá — dữ liệu thật không bị chạm</div>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* ===== PIPELINE CHẠY CHẠY ===== */}
