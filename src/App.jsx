@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // Dùng HashRouter vì GitHub Pages là host tĩnh (không rewrite URL được như BrowserRouter)
-import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { CryptoUtil } from './CryptoUtil';
 import { Shield, Users, Building2, LayoutDashboard, Home } from 'lucide-react';
 import Landing from './pages/Landing';
@@ -101,6 +101,8 @@ function App() {
             <PeopleTable people={people} departments={departments} savePeople={savePeople} />
           </AdminLayout>
         } />
+        {/* Route lạ (VD bấm #thuat-toan cũ) → quay về landing thay vì màn đen */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
   );
