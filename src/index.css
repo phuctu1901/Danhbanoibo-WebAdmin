@@ -1143,3 +1143,61 @@ button.danger:hover {
 
 /* Override: nút ghost của landing không inherits nền trắng từ button global */
 .landing-btn-ghost { background: transparent; }
+
+/* ===================== MULTI DANH BẠ + BẢO MẬT ===================== */
+.dataset-switcher { padding: 0 0.25rem 1.25rem; border-bottom: 1px solid var(--border-light); margin-bottom: 1.25rem; }
+.dataset-switcher label {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.dataset-switcher .flex { display: flex; gap: 0.4rem; }
+.dataset-switcher select { flex: 1; min-width: 0; }
+
+.ds-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.ds-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  flex-wrap: wrap;
+  transition: var(--transition-fast);
+}
+.ds-row.active { border-color: rgba(50, 145, 255, 0.45); box-shadow: 0 0 0 1px rgba(50, 145, 255, 0.18); }
+.ds-row input { flex: 1; min-width: 150px; }
+.ds-count { color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; }
+.chip-active {
+  color: var(--accent);
+  background: rgba(50, 145, 255, 0.12);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.verify-box {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  animation: fadeIn 0.3s ease both;
+}
+.verify-box svg { flex-shrink: 0; margin-top: 2px; }
+.verify-box.ok { color: var(--success); background: rgba(18, 165, 148, 0.1); border: 1px solid rgba(18, 165, 148, 0.3); }
+.verify-box.fail { color: var(--danger); background: var(--danger-bg); border: 1px solid rgba(229, 72, 77, 0.3); }
+
+.grid-2 .flex-wrap input { flex: 1; min-width: 180px; }
+
+.danger-zone { border-color: rgba(229, 72, 77, 0.35); }
+.danger-zone:hover { border-color: rgba(229, 72, 77, 0.6); }

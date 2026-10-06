@@ -4,7 +4,7 @@ import {
   Shield, Lock, Key, Smartphone, ArrowRight, CheckCircle2, XCircle, Clock, UserX,
   ShieldAlert, Search, Phone, Cake, Star, Building2, WifiOff, FileSpreadsheet,
   FileJson, Database, Zap, Cpu, ServerOff, Apple, Play, RotateCcw, Loader2,
-  Github, FileLock, Fingerprint, RefreshCw, Ban
+  Github, FileLock, Fingerprint, RefreshCw, Ban, Layers, ShieldCheck
 } from 'lucide-react';
 import { CryptoUtil } from '../CryptoUtil';
 
@@ -128,8 +128,10 @@ const USER_FEATURES = [
 
 const ADMIN_FEATURES = [
   { icon: <FileSpreadsheet size={20} />, title: 'Nhập liệu bảng tính', desc: 'Gõ trực tiếp kiểu Excel ngay trên web, hoặc tải form mẫu .xlsx điền hàng loạt rồi upload lại.' },
+  { icon: <Layers size={20} />, title: 'Nhiều danh bạ song song', desc: 'Từng đơn vị / chi nhánh một tập riêng — phát hành & cập nhật độc lập. App iOS quản lý nhiều danh bạ cùng lúc, nhập trùng tên là tự cập nhật.' },
   { icon: <Lock size={20} />, title: 'Xuất file .enc', desc: 'Một nút phát hành — JSON được mã hoá AES-256-GCM thành file .enc.' },
   { icon: <Key size={20} />, title: 'Cấp mã theo thiết bị', desc: 'Dán Device ID nhận mã kích hoạt riêng. Mỗi máy một mã, máy nào lộ cũng không dùng được sang máy khác.' },
+  { icon: <ShieldCheck size={20} />, title: 'Kiểm tra file trước khi phát hành', desc: 'Giả lập đúng như trên iPhone: giải mã thử file .enc bằng cặp Device ID + mã kích hoạt sẽ gửi cho người dùng.' },
   { icon: <FileJson size={20} />, title: 'Backup JSON', desc: 'Sao lưu / khôi phục dữ liệu không mã hoá khi đổi máy, cùng cảnh báo mất Master Key.' },
 ];
 
