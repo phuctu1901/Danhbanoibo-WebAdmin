@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './' // for Github Pages
+  base: '/Danhbanoibo-WebAdmin/', // Cấu hình bắt buộc để chạy trên Github Pages
 })
